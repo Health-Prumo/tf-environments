@@ -7,7 +7,8 @@ Ambientes da infraestrutura do **Prumo** na AWS, em Terragrunt. Os módulos vêm
 ```
 global/              # recursos de escopo da conta
 ├── root.hcl         # estado remoto, provider e entradas comuns
-└── budgets/         # alertas de custo em US$ 20 e US$ 40
+├── budgets/         # alertas de custo em US$ 20 e US$ 40
+└── cost-anomaly/    # anomalias de custo acima de US$ 5, resumo diário por e-mail
 ```
 
 Os ambientes da aplicação (`dev/` e, se precisar, `prod/`) entram quando a infra for provisionada.
@@ -26,7 +27,9 @@ O provider tem `allowed_account_ids`, então qualquer comando em outra conta fal
 
 - Terraform >= 1.10 e Terragrunt >= 1.0
 - Acesso à conta pela CLI: `aws login --profile prumo` e `export AWS_PROFILE=prumo`
-- E-mails dos alertas: `export PRUMO_ALERT_EMAILS="a@exemplo.com,b@exemplo.com"`
+- E-mails dos alertas (fora do repositório, que é público):
+  - `export PRUMO_ALERT_EMAILS="a@exemplo.com,b@exemplo.com"` para o `budgets`
+  - `export PRUMO_ANOMALY_EMAILS="a@exemplo.com,b@exemplo.com"` para o `cost-anomaly`
 
 ## Uso
 
