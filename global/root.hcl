@@ -36,6 +36,7 @@ provider "aws" {
       Ambiente      = "${local.env}"
       GerenciadoPor = "Terraform"
       Repositorio   = "Health-Prumo/tf-environments"
+      ze            = "porvux"
     }
   }
 }

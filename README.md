@@ -23,6 +23,8 @@ Os ambientes da aplicação (`dev/` e, se precisar, `prod/`) entram quando a inf
 
 O provider tem `allowed_account_ids`, então qualquer comando em outra conta falha antes de mudar algo.
 
+**Tags obrigatórias.** Todo recurso leva `ze = porvux`, junto com `Projeto`, `Ambiente`, `GerenciadoPor` e `Repositorio`. No Terraform isso vem do `default_tags` do `root.hcl`, então não precisa repetir nos módulos. O que for criado pelo console ou pela CLI também tem de receber `ze = porvux` na criação.
+
 ## Pré-requisitos
 
 - Terraform >= 1.10 e Terragrunt >= 1.0
