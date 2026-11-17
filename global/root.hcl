@@ -3,6 +3,7 @@ locals {
   account_id = "444331926746"
   region     = "us-east-1"
   basename   = "prumo"
+  profile    = "prumo"
   env        = "global"
 }
 
@@ -18,16 +19,21 @@ remote_state {
     region       = local.region
     encrypt      = true
     use_lockfile = true
+    # Lê o estado só com o perfil do Prumo e só na conta do Prumo, mesmo com outro AWS_PROFILE ativo.
+    profile             = local.profile
+    allowed_account_ids = [local.account_id]
   }
 }
 
-# allowed_account_ids impede rodar na conta errada, mesmo com outro AWS_PROFILE ativo.
+# profile fixa as credenciais do Prumo e ignora o AWS_PROFILE do terminal.
+# allowed_account_ids impede rodar na conta errada, mesmo assim.
 generate "provider" {
   path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
   contents  = <<EOT
 provider "aws" {
   region              = "${local.region}"
+  profile             = "${local.profile}"
   allowed_account_ids = ["${local.account_id}"]
 
   default_tags {

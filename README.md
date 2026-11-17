@@ -22,7 +22,9 @@ Os ambientes da aplicação (`dev/` e, se precisar, `prod/`) entram quando a inf
 | Região | `us-east-1` |
 | Estado | S3 `prumo-terraform-state-444331926746`, com versionamento e trava nativa (`use_lockfile`) |
 
-O provider tem `allowed_account_ids`, então qualquer comando em outra conta falha antes de mudar algo.
+**Proteção contra conta errada.** O backend e o provider usam sempre o perfil `prumo` (o `AWS_PROFILE` do terminal é ignorado) e têm `allowed_account_ids = ["444331926746"]`. Com outro perfil ou outra conta, o comando falha antes de ler o estado ou mudar algo.
+
+Se uma unidade reclamar de "Backend initialization required" depois de mudança no `root.hcl`, rode `terragrunt init -reconfigure` nela uma vez.
 
 **Tags obrigatórias.** Todo recurso leva `ze = porvux`, junto com `Projeto`, `Ambiente`, `GerenciadoPor` e `Repositorio`. No Terraform isso vem do `default_tags` do `root.hcl`, então não precisa repetir nos módulos. O que for criado pelo console ou pela CLI também tem de receber `ze = porvux` na criação.
 
