@@ -8,7 +8,8 @@ Ambientes da infraestrutura do **Prumo** na AWS, em Terragrunt. Os módulos vêm
 global/              # recursos de escopo da conta
 ├── root.hcl         # estado remoto, provider e entradas comuns
 ├── budgets/         # alertas de custo em US$ 20 e US$ 40
-└── cost-anomaly/    # anomalias de custo acima de US$ 5, resumo diário por e-mail
+├── cost-anomaly/    # anomalias de custo acima de US$ 5, resumo diário por e-mail
+└── dns/             # zona do healthprumo.online no Route 53 (DNS delegado pela GoDaddy)
 ```
 
 Os ambientes da aplicação (`dev/` e, se precisar, `prod/`) entram quando a infra for provisionada.
