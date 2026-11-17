@@ -9,7 +9,8 @@ global/              # recursos de escopo da conta
 ├── root.hcl         # estado remoto, provider e entradas comuns
 ├── budgets/         # alertas de custo em US$ 20 e US$ 40
 ├── cost-anomaly/    # anomalias de custo acima de US$ 5, resumo diário por e-mail
-└── dns/             # zona do healthprumo.online no Route 53 (DNS delegado pela GoDaddy)
+├── dns/             # zona do healthprumo.online no Route 53 (DNS delegado pela GoDaddy)
+└── landing/         # landing page em https://healthprumo.online (S3, CloudFront, ACM)
 ```
 
 Os ambientes da aplicação (`dev/` e, se precisar, `prod/`) entram quando a infra for provisionada.
@@ -47,3 +48,13 @@ terragrunt apply
 Na primeira execução da conta, o bucket do estado ainda não existe. Crie com `terragrunt init --backend-bootstrap`.
 
 Para rodar tudo de um ambiente: `terragrunt run --all plan` dentro de `global/`.
+
+## Publicar a landing page
+
+O conteúdo vem do repositório [Health-Prumo/Prumo-landing](https://github.com/Health-Prumo/Prumo-landing) e não é gerenciado pelo Terraform:
+
+```bash
+aws s3 cp index.html s3://prumo-global-landing-444331926746/index.html --profile prumo \
+  --content-type "text/html; charset=utf-8" --cache-control "public, max-age=300"
+aws cloudfront create-invalidation --profile prumo --distribution-id EGQ0HWH1J2FMC --paths "/*"
+```
