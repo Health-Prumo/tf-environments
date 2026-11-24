@@ -18,10 +18,11 @@ dev/                 # ambiente da aplicação
 ├── data/            # DynamoDB prumo-dev-dados (tabela única, on-demand, TTL)
 ├── auth/            # Cognito (plano Lite), login por e-mail
 ├── api/             # API Gateway HTTP + Lambda em https://api.healthprumo.online
-└── web/             # front-end (SPA) em https://app.healthprumo.online
+├── web/             # front-end (SPA) em https://app.healthprumo.online
+└── mobile/          # download do app Android em https://download.healthprumo.online
 ```
 
-Ordem de criação do `dev/`: `network`, `data` e `auth`, depois `api` e `web` (o `run --all` resolve as dependências).
+Ordem de criação do `dev/`: `network`, `data` e `auth`, depois `api`, `web` e `mobile` (o `run --all` resolve as dependências).
 
 **Custo do `dev/`.** Quase tudo é cobrado por uso e fica em centavos. A exceção são os interface endpoints do `network` (cerca de US$ 29,20/mês). Para desligá-los fora da janela de teste, use `interface_endpoint_services = []` em `dev/network/terragrunt.hcl` e `PRUMO_IA = "mock"` em `dev/api/terragrunt.hcl`.
 
@@ -73,3 +74,4 @@ aws cloudfront create-invalidation --profile prumo --distribution-id EGQ0HWH1J2F
 
 - **API:** `scripts/deploy.sh` do [prumo-api](https://github.com/Health-Prumo/prumo-api) troca o código da Lambda `prumo-dev-api`.
 - **Front:** `scripts/deploy.sh` do [prumo-web](https://github.com/Health-Prumo/prumo-web) publica no bucket de `terragrunt output bucket_name` (em `dev/web`) e invalida o CloudFront. O `client_id` do Cognito sai de `terragrunt output client_id` em `dev/auth`.
+- **App Android:** `scripts/deploy.sh` do [prumo-mobile](https://github.com/Health-Prumo/prumo-mobile) publica o APK e a página de download no bucket de `terragrunt output bucket_name` (em `dev/mobile`) e invalida o CloudFront.

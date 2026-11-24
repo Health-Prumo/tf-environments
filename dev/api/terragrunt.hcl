@@ -46,7 +46,6 @@ dependency "dns" {
 }
 
 locals {
-  modelo  = "amazon.nova-micro-v1:0"
   origens = ["https://app.healthprumo.online", "http://localhost:5173"]
 }
 
@@ -56,7 +55,6 @@ inputs = {
   subnet_ids          = dependency.network.outputs.private_subnet_ids
   security_group_ids  = [dependency.network.outputs.app_security_group_id]
   dynamodb_table_arns = [dependency.data.outputs.table_arn]
-  bedrock_model_ids   = [local.modelo]
   jwt_issuer          = dependency.auth.outputs.issuer_url
   jwt_audience        = [dependency.auth.outputs.client_id]
   cors_allow_origins  = local.origens
@@ -66,11 +64,10 @@ inputs = {
   zone_id       = dependency.dns.outputs.zone_id
 
   environment_variables = {
-    PRUMO_AMBIENTE  = "dev"
-    PRUMO_AUTH      = "cognito"
-    PRUMO_TABELA    = dependency.data.outputs.table_name
-    PRUMO_IA        = "bedrock"
-    PRUMO_MODELO_ID = local.modelo
-    PRUMO_ORIGENS   = join(",", local.origens)
+    PRUMO_AMBIENTE = "dev"
+    PRUMO_AUTH     = "cognito"
+    PRUMO_TABELA   = dependency.data.outputs.table_name
+    PRUMO_IA       = "mock" # Coach e card por regras, sem IA generativa
+    PRUMO_ORIGENS  = join(",", local.origens)
   }
 }
