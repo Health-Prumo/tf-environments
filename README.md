@@ -11,9 +11,19 @@ global/              # recursos de escopo da conta
 ├── cost-anomaly/    # anomalias de custo acima de US$ 5, resumo diário por e-mail
 ├── dns/             # zona do healthprumo.online no Route 53 (DNS delegado pela GoDaddy)
 └── landing/         # landing page em https://healthprumo.online (S3, CloudFront, ACM)
+
+dev/                 # ambiente da aplicação
+├── root.hcl
+├── network/         # VPC privada, sem NAT; endpoints do DynamoDB, Bedrock Runtime e Logs
+├── data/            # DynamoDB prumo-dev-dados (tabela única, on-demand, TTL)
+├── auth/            # Cognito (plano Lite), login por e-mail
+├── api/             # API Gateway HTTP + Lambda em https://api.healthprumo.online
+└── web/             # front-end (SPA) em https://app.healthprumo.online
 ```
 
-Os ambientes da aplicação (`dev/` e, se precisar, `prod/`) entram quando a infra for provisionada.
+Ordem de criação do `dev/`: `network`, `data` e `auth`, depois `api` e `web` (o `run --all` resolve as dependências).
+
+**Custo do `dev/`.** Quase tudo é cobrado por uso e fica em centavos. A exceção são os interface endpoints do `network` (cerca de US$ 29,20/mês). Para desligá-los fora da janela de teste, use `interface_endpoint_services = []` em `dev/network/terragrunt.hcl` e `PRUMO_IA = "mock"` em `dev/api/terragrunt.hcl`.
 
 ## Conta
 
@@ -58,3 +68,8 @@ aws s3 cp index.html s3://prumo-global-landing-444331926746/index.html --profile
   --content-type "text/html; charset=utf-8" --cache-control "public, max-age=300"
 aws cloudfront create-invalidation --profile prumo --distribution-id EGQ0HWH1J2FMC --paths "/*"
 ```
+
+## Publicar o app (dev)
+
+- **API:** `scripts/deploy.sh` do [prumo-api](https://github.com/Health-Prumo/prumo-api) troca o código da Lambda `prumo-dev-api`.
+- **Front:** `scripts/deploy.sh` do [prumo-web](https://github.com/Health-Prumo/prumo-web) publica no bucket de `terragrunt output bucket_name` (em `dev/web`) e invalida o CloudFront. O `client_id` do Cognito sai de `terragrunt output client_id` em `dev/auth`.

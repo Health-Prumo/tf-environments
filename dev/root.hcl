@@ -1,0 +1,56 @@
+# Ambiente da aplicação (front, API, banco, login e rede).
+locals {
+  account_id = "444331926746"
+  region     = "us-east-1"
+  basename   = "prumo"
+  profile    = "prumo"
+  env        = "dev"
+}
+
+remote_state {
+  backend = "s3"
+  generate = {
+    path      = "backend.tf"
+    if_exists = "overwrite_terragrunt"
+  }
+  config = {
+    bucket       = "${local.basename}-terraform-state-${local.account_id}"
+    key          = "${local.env}/${path_relative_to_include()}/terraform.tfstate"
+    region       = local.region
+    encrypt      = true
+    use_lockfile = true
+    # Lê o estado só com o perfil do Prumo e só na conta do Prumo, mesmo com outro AWS_PROFILE ativo.
+    profile             = local.profile
+    allowed_account_ids = [local.account_id]
+  }
+}
+
+# profile fixa as credenciais do Prumo e ignora o AWS_PROFILE do terminal.
+# allowed_account_ids impede rodar na conta errada, mesmo assim.
+generate "provider" {
+  path      = "provider.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOT
+provider "aws" {
+  region              = "${local.region}"
+  profile             = "${local.profile}"
+  allowed_account_ids = ["${local.account_id}"]
+
+  default_tags {
+    tags = {
+      Projeto       = "Prumo"
+      Ambiente      = "${local.env}"
+      GerenciadoPor = "Terraform"
+      Repositorio   = "Health-Prumo/tf-environments"
+      ze            = "porvux"
+    }
+  }
+}
+EOT
+}
+
+inputs = {
+  basename    = local.basename
+  environment = local.env
+  region      = local.region
+}
